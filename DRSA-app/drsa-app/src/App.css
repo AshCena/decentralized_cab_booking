@@ -92,7 +92,7 @@
 
 .locationInputs {
   position: absolute;
-  top: 10px;
+  top: 22%;
   left: 50%;
   transform: translateX(-50%);
   background-color: black; /* Set background color to black */
@@ -109,9 +109,20 @@
   color: rgb(249, 245, 245); /* Text color for the button */
   border: none;
   padding: 10px;
-  width: 10%;
+  width: 100%;
   cursor: pointer;
   margin-left: 45%;
+}
+
+.buttonContainer {
+  position: absolute;
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Offset the container by half its width and height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100; /* Ensure it's above the map */
 }
 
 .sidebarToggle {
@@ -208,3 +219,4 @@
     opacity: 0;
   }
 }
+

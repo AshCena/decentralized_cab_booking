@@ -14,6 +14,7 @@ import { RidePassProvider } from './pages/RidePassContext';
 import { RideCreditProvider } from './pages/RideCreditsContext';
 import { NftTokenProvider } from './pages/NFTTokenContext';
 import Confetti from 'react-confetti';
+import PassValidator from './pages/PassValidator';
 
 
 
@@ -61,6 +62,8 @@ function App(){
                 <Route path="/driver" element={<DriverScreen />} />
                 <Route path="/payment" element={<AssetManagement />} />
                 <Route path="/xrp" element={<XRPPasses />} />
+                <Route path="/validate" element={<PassValidator />} />
+
               </Routes>
               </Router>
                   

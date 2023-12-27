@@ -10,6 +10,7 @@ const XRPPasses = () => {
     const [xrpPasses, setXrpPasses] = useState([]);
     const [web3, setWeb3] = useState(null);
     const [account, setAccount] = useState('');
+    const [signedMessage, setSignedMessage] = useState('');
 
     useEffect(() => {
 
@@ -52,6 +53,116 @@ const XRPPasses = () => {
         }
     }, [web3, account]);
 
+    const constructPaymentMessage = (contractAddress, weiamount) => {
+        console.log('Inside Construct Message');
+        return web3.utils.soliditySha3(contractAddress, weiamount);
+    };
+    function stringToBytes(str) {
+        const encoder = new TextEncoder();
+        const bytes = encoder.encode(str);
+        return bytes;
+    }
+    const constructAndSignMessage = async (tokenId, account) => {
+        const weiamount = web3.utils.toWei(tokenId, 'ether');
+        // const hexAmount = web3.utils.toHex(weiamount);
+
+        const message = web3.utils.soliditySha3(
+        { type: 'address', value: config.passContract },
+        { type: 'uint256', value: weiamount }
+        );
+        
+        console.log("type of and tokenid ", tokenId, typeof(tokenId));
+        console.log("mesage: ", message, "  type of message ", typeof(message));
+        const signedMessage = await web3.eth.sign(message, account);
+        return signedMessage;
+    };
+    const findDescriptionForToken = (tokenId) => {
+        const pass = xrpPasses.find(p => Number(p.id) === Number(tokenId));
+        return pass ? pass.description : 'Description not found';
+      };
+    const handleSignedMessage = async (receiver, tokenId) => {
+        if(receiver !== account){
+            alert('Error in receiver\'s address.');
+            return false;
+        }
+        // if(amount <= 0){
+        //     alert('Please correct the amount.');
+        //     return false;
+        // }
+        
+        const message = await constructAndSignMessage(parseInt(tokenId), account)
+        setSignedMessage(message);
+
+        console.log("message", message)
+        const response = await fetch('http://localhost:4000/api/pass/generate-pass', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ passName: findDescriptionForToken(tokenId), userName: account, signedMessage: message, tokenId: tokenId  }),
+          });
+        
+          const blob = await response.blob();
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = 'pass.pdf';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+
+    };
+
+
+
+    const signMessage = async (message, amount) => {
+        try {
+            console.log("Account: ", account);
+            console.log("Message: ", message);
+            console.log("amount: ", amount);
+
+        
+            let signedMessage;
+            if (window.ethereum) {
+              // If using MetaMask
+              signedMessage = await window.ethereum.request({
+                method: 'personal_sign',
+                params: [message, account],
+              });
+            } else {
+              // Using web3 provider
+              signedMessage = await web3.eth.personal.sign(message, account);
+            }
+            setSignedMessage(signedMessage);
+            console.log('Signed Message:', signedMessage);
+            // Additional UI handling for displaying the signed message
+            console.log("xrPPasses: ", xrpPasses)
+            const findDescriptionForToken = (amount) => {
+                const pass = xrpPasses.find(p => Number(p.id) === Number(amount));
+                return pass ? pass.description : 'Description not found';
+              };
+
+            const response = await fetch('http://localhost:4000/api/pass/generate-pass', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ passName: findDescriptionForToken(amount), userName: account, signedMessage: signedMessage, tokenId: amount  }),
+              });
+            
+              const blob = await response.blob();
+              const downloadUrl = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = downloadUrl;
+              link.download = 'pass.pdf';
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
+        } catch (error) {
+            console.error("Error in signing the message:", error);
+        }
+    };
+
     const fetchXrpPasses = async () => {
 
         if (!web3) {
@@ -75,6 +186,14 @@ const XRPPasses = () => {
     };
 
 
+    const handleUseXrp = async (tokenId) => {
+        await handleSignedMessage(account, tokenId);
+        // Call your API here after signing the message
+        // Example API call
+        
+    };
+
+
     return (
         <div className="xrp-passes-container">
             {xrpPasses.map(pass => (
@@ -85,6 +204,8 @@ const XRPPasses = () => {
                         <p>Description: {pass.description} Wei</p>
 
                         <p>Price: {pass.price.toString()} Wei</p>
+                        <button onClick={() => handleUseXrp(pass.id.toString())}>Use XRP</button>
+
                     </div>
                 </div>
             ))}

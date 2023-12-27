@@ -5,6 +5,8 @@ const cors = require('cors');
 
 
 const userRoutes = require('./routes/userRoutes');
+const passRoutes = require('./routes/passRoutes');
+
 const app = express();
 
 
@@ -15,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/user', userRoutes);
+app.use('/api/pass', passRoutes);
 
 
 const PORT = 4000;

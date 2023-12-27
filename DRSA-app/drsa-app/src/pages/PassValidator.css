@@ -1,0 +1,35 @@
+/* src/ValidateSignaturePage.css */
+.validation-page {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .validation-page input, .validation-page textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .validation-page button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 20px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .validation-page button:hover {
+    background-color: #45a049;
+  }
+  
+  .validation-page p {
+    color: #333;
+    margin-top: 15px;
+  }
+  
